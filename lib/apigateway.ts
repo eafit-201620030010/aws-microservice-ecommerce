@@ -4,12 +4,21 @@ import { Construct } from "constructs";
 
 interface SwnApiGatewayProps {
   productMicroservice: IFunction;
+  basketMicroservice: IFunction;
 }
 
 export class SwnApiGateway extends Construct {
   constructor(scope: Construct, id: string, props: SwnApiGatewayProps) {
     super(scope, id);
 
+    // Product api gateway
+    this.createProductApi(props.productMicroservice);
+
+    // Basket api gateway
+    this.createBasketApi(props.basketMicroservice);
+  }
+
+  private createProductApi(productMicroservice: IFunction) {
     // Product microservices api gateway
     // root name = product
 
@@ -23,7 +32,7 @@ export class SwnApiGateway extends Construct {
 
     const apigw = new LambdaRestApi(this, "productApi", {
       restApiName: "Product Service",
-      handler: props.productMicroservice,
+      handler: productMicroservice,
       proxy: false,
     });
 
@@ -35,5 +44,39 @@ export class SwnApiGateway extends Construct {
     singleProduct.addMethod("GET"); // GET /product/{id}
     singleProduct.addMethod("PUT"); // PUT /product/{id}
     singleProduct.addMethod("DELETE"); // DELETE /product/{id}
+  }
+
+  private createBasketApi(basketMicrosercice: IFunction) {
+    // Basket microservices api gateway
+    // root name = basket
+
+    // GET /basket
+    // POST /basket
+
+    // Single basket with userName parameter
+    // resource name = basket/{userName}
+    // GET /basket/{userName}
+    // DELETE /basket/{userName}
+
+    // checkout basket asyc flow
+    // resource name = basket/checkout
+    // POST /basket/checkout
+    const apigw = new LambdaRestApi(this, "basketApi", {
+      restApiName: "Basket Service",
+      handler: basketMicrosercice,
+      proxy: false,
+    });
+
+    const basket = apigw.root.addResource("basket");
+    basket.addMethod("GET"); // GET /basket
+    basket.addMethod("POST"); // POST /basket
+
+    const singleBasket = basket.addResource("{userName}");
+    singleBasket.addMethod("GET"); // GET /basket/{userName}
+    singleBasket.addMethod("DELETE"); // DELETE /product/{userName}
+
+    const basketCheckout = basket.addResource("checkout");
+    basketCheckout.addMethod("POST"); // POST /basket/checkout
+    // expected request payload : { userName : swn }
   }
 }
