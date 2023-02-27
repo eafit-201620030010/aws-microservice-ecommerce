@@ -10,6 +10,7 @@ import { Construct } from "constructs";
 export class SwnDatabase extends Construct {
   public readonly productTable: ITable;
   public readonly basketTable: ITable;
+  public readonly orderTable: ITable;
 
   constructor(scope: Construct, id: string) {
     super(scope, id);
@@ -19,6 +20,9 @@ export class SwnDatabase extends Construct {
 
     // basket table
     this.basketTable = this.createBasketTable();
+
+    // order table
+    this.orderTable = this.createOrderTable();
   }
 
   // Product DynamoDB Table Creation
@@ -53,5 +57,24 @@ export class SwnDatabase extends Construct {
     });
 
     return basketTable;
+  }
+
+  // Order DynamoBD Table Creation
+  // Order : PK: userName - SK: orderDate -- totalPrice - firstName - lastName - email - address - paymentMethod - cardInfo
+  private createOrderTable(): ITable {
+    const orderTable = new Table(this, "order", {
+      partitionKey: {
+        name: "userName",
+        type: AttributeType.STRING,
+      },
+      sortKey: {
+        name: "orderDate",
+        type: AttributeType.STRING,
+      },
+      tableName: "order",
+      removalPolicy: RemovalPolicy.DESTROY, // NOT recommended for production code
+      billingMode: BillingMode.PAY_PER_REQUEST,
+    });
+    return orderTable;
   }
 }
