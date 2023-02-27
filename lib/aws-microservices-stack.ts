@@ -2,6 +2,7 @@ import * as cdk from "aws-cdk-lib";
 import { Construct } from "constructs";
 import { SwnApiGateway } from "./apigateway";
 import { SwnDatabase } from "./database";
+import { SwnEventBus } from "./eventbus";
 import { SwnMicroservices } from "./microservice";
 
 export class AwsMicroservicesStack extends cdk.Stack {
@@ -18,6 +19,11 @@ export class AwsMicroservicesStack extends cdk.Stack {
     const apigateway = new SwnApiGateway(this, "ApiGateway", {
       productMicroservice: microservices.productMicroservice,
       basketMicroservice: microservices.basketMicroservice,
+    });
+
+    const eventbus = new SwnEventBus(this, "EventBus", {
+      publisherFuntion: microservices.basketMicroservice,
+      targetFuntion: microservices.orderingMicroservice,
     });
   }
 }
