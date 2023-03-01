@@ -1,0 +1,11 @@
+{
+  "name": "@src/ordering",
+  "version": "1.0.0",
+  "author": "jjchavarrg <jjchavarrg@eafit.edu.co>",
+  "license": "MIT",
+  "main": "index.js",
+  "dependencies": {
+    "@aws-sdk/client-dynamodb": "^3.278.0",
+    "@aws-sdk/util-dynamodb": "^3.278.0"
+  }
+}
