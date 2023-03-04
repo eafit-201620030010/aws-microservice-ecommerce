@@ -12,14 +12,28 @@ exports.handler = async function (event) {
 
   // TODO - Catch and Process Async EventBridge Invocation and Sync API Gateway Invocation
 
-  const eventType = event["detail-type"];
-  if (eventType !== undefined) {
+  if (event.Records != null) {
+    // SQS Invocation
+    await sqsInvocation(event);
+  } else if (event["detail-type"] !== undefined) {
     // EventBridge Invocation
     await eventBridgeInvocation(event);
   } else {
     // API Gateway Invocation -- return sync response
     return await apiGatewayInvocation(event);
   }
+};
+
+const sqsInvocation = async (event) => {
+  console.log(`sqsInvocation function. event : "${event}"`);
+
+  event.Records.forEach(async (record) => {
+    // expected request
+    const checkoutEventRequest = JSON.parse(record.body);
+
+    // create order item into db
+    await createOrder(checkoutEventRequest.detail);
+  });
 };
 
 const eventBridgeInvocation = async (event) => {
